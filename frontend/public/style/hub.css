@@ -1,0 +1,8 @@
+:root { --bg:#0b0f17; --fg:#e7e7ea; --brand:#6ea8fe; }
+html,body,#root{height:100%} body{margin:0;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,Arial,sans-serif}
+h1,h2{margin:8px 0 16px}
+.btn{padding:10px 16px;border:1px solid #3b3f4a;background:#1a2233;color:var(--fg);border-radius:10px;cursor:pointer}
+.btn:hover{filter:brightness(1.1)}
+.btn-primary{padding:10px 16px;border:1px solid #355; background:linear-gradient(180deg,#1c2a44,#142033); color:#cfe5ff; border-radius:10px; cursor:pointer}
+.btn-primary:hover{filter:brightness(1.15)}
+input{padding:8px 10px;border-radius:8px;border:1px solid #39414f;background:#101620;color:#e7e7ea}

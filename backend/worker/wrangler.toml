@@ -1,0 +1,11 @@
+name = "forja-activity"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+
+[[d1_databases]]
+binding = "DB"            # usar no código: env.DB
+database_name = "forja_d1"
+database_id = "bef5d327-2711-490a-806c-ab0eef31c493"  # coloque o seu
+
+[vars]
+CORS_ORIGIN = "https://forjainfinita.pages.dev"

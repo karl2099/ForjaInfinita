@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>3D&T Alpha — Modo Criação (Forja Infinita)</title>
+
+  <!-- Estilos do modo criação -->
+  <link rel="stylesheet" href="./criacao.css" />
+
+  <!-- (Opcional/Seguro) Garante que só a etapa ativa aparece mesmo se houver CSS global do app. -->
+  <style>
+    .page-wrapper .etapa-tutorial { display: none; }
+    .page-wrapper .etapa-tutorial.etapa-ativa { display: block; }
+    #tela-finalizacao-criacao { display: none; }
+  </style>
+  <script>
+// exibe erros na própria página
+window.addEventListener('error', function (e) {
+  const box = document.createElement('pre');
+  box.style.position = 'fixed';
+  box.style.bottom = '0';
+  box.style.left = '0';
+  box.style.right = '0';
+  box.style.background = 'rgba(0,0,0,0.8)';
+  box.style.color = '#f88';
+  box.style.padding = '8px';
+  box.style.zIndex = '10000';
+  box.textContent = 'Erro: ' + e.message + ' (' + e.filename + ':' + e.lineno + ')';
+  document.body.appendChild(box);
+});
+</script>
+<script>
+window.addEventListener('error', function (e) {
+  fetch('/api/log', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      message: e.message,
+      filename: e.filename,
+      lineno: e.lineno,
+      colno: e.colno,
+      stack: e.error && e.error.stack
+    })
+  });
+});
+</script>
+
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="ficha-container">
+      <!-- CABEÇALHO E SUMÁRIO DE PONTOS -->
+      <div class="cabecalho-ficha">
+        <h1>3D&amp;T • Defensores de Tóquio 3ª Edição Alpha</h1>
+        <h2>FICHA DE PERSONAGEM</h2>
+      </div>
+
+      <div class="sumario-pontos">
+        <div><strong>Pontuação Inicial:</strong> <span id="sumario-pontuacao-inicial">0</span></div>
+        <div><strong>Ptos. Gastos Caract.:</strong> <span id="sumario-pontos-gastos-carac">0</span></div>
+        <div><strong>Ptos. Gastos Vant.:</strong> <span id="sumario-pontos-gastos-vant">0</span></div>
+        <div><strong>Ptos. Desvantagens:</strong> <span id="sumario-pontos-desvantagens">0</span></div>
+        <hr/>
+        <div><strong>Pontos Restantes:</strong> <span id="sumario-pontos-restantes">0</span></div>
+      </div>
+
+      <!-- ================== ETAPAS DO TUTORIAL ================== -->
+
+      <!-- 0) Etapa Preliminar -->
+      <div class="etapa-tutorial etapa-ativa" id="etapa-0">
+        <h3>Etapa Preliminar: Identificação e Pontuação</h3>
+        <p class="dica">
+          Bem-vindo à criação de seu Herói em 3D&amp;T Alpha! Primeiro, defina o nome do seu personagem. Depois,
+          escolha a pontuação inicial da sua campanha, conforme definido pelo mestre. Esta pontuação mede o poder
+          inicial do seu herói.
+        </p>
+        <div class="conteudo-rolavel-etapa">
+          <div class="campo-grupo">
+            <label for="nomePersonagem">Nome do Personagem:</label>
+            <input id="nomePersonagem" name="nomePersonagem" type="text" />
+          </div>
+          <div class="campo-grupo">
+            <label for="pontuacaoInicial">
+              <span class="tooltip" data-descricao="&lt;strong&gt;Pessoa Comum (0-4 pontos):&lt;/strong&gt; poder de combate quase nulo.&lt;br&gt;&lt;strong&gt;Novato (5 pontos):&lt;/strong&gt; início de carreira; até –3 pts em desvantagens.&lt;br&gt;&lt;strong&gt;Lutador (7 pontos):&lt;/strong&gt; alguma experiência; até –4 pts.&lt;br&gt;&lt;strong&gt;Campeão (10 pontos):&lt;/strong&gt; muitas vitórias; até –5 pts.&lt;br&gt;&lt;strong&gt;Lenda (12 pontos):&lt;/strong&gt; topo do mundo; até –6 pts.">Pontuação Inicial</span>:
+            </label>
+            <select id="pontuacaoInicial" name="pontuacaoInicial">
+              <option value="0">Escolha...</option>
+              <option value="5">Novato (5 pontos)</option>
+              <option value="7">Lutador (7 pontos)</option>
+              <option value="10">Campeão (10 pontos)</option>
+              <option value="12">Lenda (12 pontos)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1) Conceito -->
+      <div class="etapa-tutorial" id="etapa-1">
+        <h3>O Conceito</h3>
+        <p class="dica">
+          Todo herói começa com uma ideia. Descreva o conceito básico do seu personagem: sua origem, motivações, aparência, personalidade.
+        </p>
+        <div class="conteudo-rolavel-etapa">
+          <div class="campo-grupo">
+            <label for="conceitoPersonagem">Conceito e História:</label>
+            <textarea id="conceitoPersonagem" name="conceitoPersonagem" rows="5"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2) Vantagem Única -->
+      <div class="etapa-tutorial" id="etapa-2">
+        <h3>Vantagem Única</h3>
+        <p class="dica">
+          Se o seu personagem não for um humano comum, ele pode ter uma Vantagem Única, que define sua raça ou natureza especial. Você só pode ter uma.
+        </p>
+        <div class="conteudo-rolavel-etapa">
+          <div class="lista-habilidades" id="lista-vantagens-unicas-container"></div>
+          <div id="sub-escolha-vu-container" style="margin-top: 15px;"></div>
+        </div>
+      </div>
+
+      <!-- 3) Características -->
+      <div class="etapa-tutorial" id="etapa-3">
+        <h3>As Características</h3>
+        <p class="dica">
+          Compre as características base (F, H, R, A, PdF). Nenhuma base pode iniciar acima de 5. R efetiva define PVs e PMs (R × 5).
+        </p>
+        <div class="conteudo-rolavel-etapa">
+          <div class="secao-caracteristicas-container">
+            <div class="caracteristicas-grid">
+              <label for="carac-f"><span class="tooltip" data-descricao="FORÇA (F): capacidade de levantar peso e causar dano corpo-a-corpo. (Manual pág. 23)">Força (F)</span>:</label>
+              <select data-caracteristica="F" id="carac-f"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+              <span class="display-efetivo" id="display-efetivo-f">(Efetivo: 0)</span>
+              <span class="info-calculada">Custo: <span id="custo-f">0</span></span>
+
+              <label for="carac-h"><span class="tooltip" data-descricao="HABILIDADE (H): agilidade, velocidade e raciocínio. (Manual pág. 24)">Habilidade (H)</span>:</label>
+              <select data-caracteristica="H" id="carac-h"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+              <span class="display-efetivo" id="display-efetivo-h">(Efetivo: 0)</span>
+              <span class="info-calculada">Custo: <span id="custo-h">0</span></span>
+
+              <label for="carac-r"><span class="tooltip" data-descricao="RESISTÊNCIA (R): vigor físico e determinação; define PVs/PMs. (Manual pág. 24)">Resistência (R)</span>:</label>
+              <select data-caracteristica="R" id="carac-r"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+              <span class="display-efetivo" id="display-efetivo-r">(Efetivo: 0)</span>
+              <span class="info-calculada">Custo: <span id="custo-r">0</span></span>
+
+              <label for="carac-a"><span class="tooltip" data-descricao="ARMADURA (A): proteção corporal (couro, escudo, campo de força...). (Manual pág. 24)">Armadura (A)</span>:</label>
+              <select data-caracteristica="A" id="carac-a"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+              <span class="display-efetivo" id="display-efetivo-a">(Efetivo: 0)</span>
+              <span class="info-calculada">Custo: <span id="custo-a">0</span></span>
+
+              <label for="carac-pdf"><span class="tooltip" data-descricao="PODER DE FOGO (PdF): ataques à distância. (Manual pág. 25)">Poder de Fogo (PdF)</span>:</label>
+              <select data-caracteristica="PdF" id="carac-pdf"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+              <span class="display-efetivo" id="display-efetivo-pdf">(Efetivo: 0)</span>
+              <span class="info-calculada">Custo: <span id="custo-pdf">0</span></span>
+
+              <span class="info-calculada" style="grid-column: 1 / -1; text-align: center; margin-top:10px; font-weight:bold; border-top: 1px dotted #888; padding-top: 10px;">--- Pontos Derivados (Baseado na Resistência Efetiva) ---</span>
+              <label>Pontos de Vida (PVs):</label><span class="info-calculada" id="display-pvs" style="grid-column: 2 / span 3; text-align:left;">0</span>
+              <label>Pontos de Magia (PMs):</label><span class="info-calculada" id="display-pms" style="grid-column: 2 / span 3; text-align:left;">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4) Vantagens -->
+      <div class="etapa-tutorial" id="etapa-4">
+        <h3>Vantagens</h3>
+        <p class="dica">
+          Vantagens são poderes e habilidades especiais que custam pontos. Algumas podem ter custo reduzido por sua VU.
+        </p>
+        <div class="conteudo-rolavel-etapa">
+          <div class="lista-habilidades" id="lista-vantagens-container"></div>
+        </div>
+      </div>
+
+      <!-- 5) Desvantagens -->
+      <div class="etapa-tutorial" id="etapa-5">
+        <h3>Desvantagens</h3>
+        <p class="dica">
+          Desvantagens concedem pontos extras. O limite de pontos ganhos depende da Pontuação Inicial (Novato –3, Lutador –4, Campeão –5, Lenda –6).
+        </p>
+        <div class="conteudo-rolavel-etapa">
+          <div class="lista-habilidades" id="lista-desvantagens-container"></div>
+          <div class="aviso-limite-desvantagens" id="aviso-limite-desvantagens" style="display:none;">
+            Atenção: Você atingiu ou excedeu o limite de pontos de desvantagens!
+          </div>
+        </div>
+      </div>
+
+      <!-- 6) Perícias -->
+      <div class="etapa-tutorial" id="etapa-6">
+        <h3>Perícias</h3>
+        <p class="dica">
+          Perícia completa custa 2 pts e concede todas as especializações. Alternativamente, 3 especializações avulsas custam 1 pt (se não estiverem cobertas por perícia completa).
+        </p>
+        <div class="conteudo-rolavel-etapa">
+          <div class="lista-habilidades" id="lista-pericias-container"></div>
+          <div class="campo-grupo" style="margin-top: 15px;">
+            <label>Especializações Avulsas Escolhidas: <span id="contador-espec-avulsas">0</span> / Custo: <span id="custo-espec-avulsas">0</span> Pts</label>
+            <p style="font-size:0.9em; color:#555;">(1 ponto a cada 3 especializações avulsas não cobertas por uma perícia completa.)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7) Magias (condicionalmente ativa) -->
+      <div class="etapa-tutorial" id="etapa-7">
+        <h3>Magias Conhecidas</h3>
+        <p class="dica">
+          Esta etapa só é usada por personagens com acesso a magia por Vantagens/VU (Branca, Negra, Elemental, Arcano...).<br>
+          Você já conhece automaticamente as magias básicas da(s) sua(s) escola(s). Além delas, pode escolher um número de
+          magias igual a <strong>H</strong>, com bônus de <strong>+3</strong> para cada uma das vantagens <em>Clericato</em>, <em>Mentor</em> e <em>Patrono</em> (cumulativas).
+        </p>
+        <div class="conteudo-rolavel-etapa" id="selecao-magias-container">
+          <h4>Magias Iniciais Automáticas:</h4>
+          <ul class="lista-habilidades" id="magias-automaticas-lista" style="max-height: 150px;"></ul>
+
+          <h4 style="margin-top:16px;">Magias para Aprender (Escolha <span id="contador-magias-aprender">0</span>):</h4>
+          <div class="lista-habilidades" id="lista-magias-para-escolha" style="max-height: 200px;"></div>
+
+          <p style="margin-top:8px;">Magias já escolhidas (além das automáticas): <strong><span id="magias-ja-escolhidas">0</span></strong></p>
+        </div>
+      </div>
+
+      <!-- 8) Dinheiro e Pertences -->
+      <div class="etapa-tutorial" id="etapa-8">
+        <h3>Dinheiro e Pertences Pessoais</h3>
+        <p class="dica">
+          Role 1d6 para dinheiro inicial. A ficha calculará suas Moedas iniciais (considerando Vantagens como Riqueza). Registre também seus pertences básicos.
+        </p>
+        <div class="conteudo-rolavel-etapa">
+          <div class="campo-grupo">
+            <label for="input-dado-dinheiro">Resultado do 1d6:</label>
+            <input id="input-dado-dinheiro" type="number" min="1" max="6" />
+            <button type="button" onclick="calcularDinheiroInicial()" style="padding: 7px 10px; margin-left: 10px;">Calcular Dinheiro</button>
+          </div>
+          <div class="campo-grupo">
+            <label>Moedas Iniciais Calculadas:</label>
+            <span id="moedas-iniciais-display" style="font-weight:bold; color: #0066cc;">(Informe o resultado do dado e clique em calcular)</span>
+          </div>
+          <hr style="margin: 20px 0;" />
+          <div class="campo-grupo">
+            <label for="pertences-pessoais">Pertences Pessoais (armas, armaduras, itens de perícia, etc.):</label>
+            <textarea id="pertences-pessoais" name="pertences-pessoais" rows="4" placeholder="Ex: Espada longa, Kit de primeiros socorros, Corda 15m..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9) Revisão e Finalização -->
+      <div class="etapa-tutorial" id="etapa-9">
+        <h3>Revisão e Finalização</h3>
+        <p class="dica">
+          Revise cuidadosamente sua ficha. Pontos Restantes deve ser 0 e o limite de desvantagens não pode ser excedido.
+        </p>
+        <div class="conteudo-rolavel-etapa">
+          <ul>
+            <li>Verifique seus Pontos Restantes no sumário à direita.</li>
+            <li>Confirme se não há avisos sobre o limite de desvantagens.</li>
+            <li>Use "Anterior" para ajustar etapas, se necessário.</li>
+          </ul>
+          <p style="text-align:center; font-weight:bold; margin-top:20px;">Quando estiver pronto, clique em <em>Finalizar</em> abaixo.</p>
+        </div>
+      </div>
+
+      <!-- ================== Navegação ================== -->
+      <div class="navegacao-tutorial">
+        <button id="btnAnterior" onclick="etapaAnterior()" disabled>Anterior</button>
+        <button id="btnProximo" onclick="proximaEtapa()">Próximo</button>
+      </div>
+
+      <!-- Placeholder do modo jogo (não usado aqui) -->
+      <div id="ficha-modo-jogo" style="display:none;"></div>
+
+      <!-- Tela de sucesso -->
+      <div id="tela-finalizacao-criacao" style="display: none; text-align: center; padding: 40px 20px; border: 1px solid #ccc; margin-top: 20px; background-color: #f9f9f9;">
+        <h3 style="margin-top: 0; color: #333;">Ficha Gerada com Sucesso!</h3>
+        <p style="color: #555;">O arquivo <strong id="nome-arquivo-gerado">Ficha_3dt_Personagem.html</strong> deve ter sido baixado para o seu computador.</p>
+        <p style="color: #555;">Você pode abrir o arquivo baixado para jogar ou guardá-lo para suas aventuras!</p>
+        <div style="margin-top: 30px;">
+          <button id="btnCriarNovoPersonagem" type="button" style="padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 4px; margin-right: 10px;">Criar Novo Personagem</button>
+          <button id="btnFecharJanela" type="button" style="padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #f44336; color: white; border: none; border-radius: 4px;">Fechar Janela/Aba</button>
+        </div>
+      </div>
+    </div> <!-- /.ficha-container -->
+  </div> <!-- /.page-wrapper -->
+
+  <!-- Container global para tooltips -->
+  <div id="global-tooltip-container"></div>
+<script>
+// ====== BOOT: tooltips globais por delegação (funcionam mesmo antes de qualquer escolha) ======
+(() => {
+  const box = (window.globalTooltipContainer ||
+               document.getElementById('global-tooltip-container') ||
+               (() => { const d=document.createElement('div'); d.id='global-tooltip-container'; document.body.appendChild(d); return d; })());
+
+  const OFFSET = 12;
+  let activeEl = null;
+
+  function show(html, x, y){
+    box.innerHTML = html || '';
+    box.style.left = (x + OFFSET) + 'px';
+    box.style.top  = (y + OFFSET) + 'px';
+    box.style.visibility = 'visible';
+    box.style.opacity    = '1';
+  }
+  function hide(){
+    box.style.opacity = '0';
+    box.style.visibility = 'hidden';
+    activeEl = null;
+  }
+
+  // Delegação global — já funciona antes de qualquer render/etapa
+  document.addEventListener('pointerenter', (ev) => {
+    const el = ev.target && ev.target.closest && ev.target.closest('.tooltip');
+    if (!el) return;
+    activeEl = el;
+    const html = el.getAttribute('data-descricao') || el.getAttribute('title') || '';
+    show(html, ev.clientX, ev.clientY);
+  }, true);
+
+  document.addEventListener('pointermove', (ev) => {
+    if (!activeEl) return;
+    box.style.left = (ev.clientX + OFFSET) + 'px';
+    box.style.top  = (ev.clientY + OFFSET) + 'px';
+  }, true);
+
+  document.addEventListener('pointerleave', (ev) => {
+    // se saiu da própria tooltip/elemento
+    if (!activeEl) return;
+    const stillInside = ev.relatedTarget && ev.relatedTarget.closest && ev.relatedTarget.closest('.tooltip');
+    if (!stillInside) hide();
+  }, true);
+
+  // Qualquer scroll ou tecla fecha, para evitar “fantasmas”
+  document.addEventListener('scroll', hide, true);
+  document.addEventListener('keydown', hide, true);
+})();
+</script>
+<!-- Bootstrap assíncrono: carrega o DB via import estático, expõe em window, depois carrega adapter e criacao.js -->
+<script type="module" src="/assets/db/database3dt.module.js"></script>
+<script type="module">
+  // 'database3dt' é exportado pelo módulo importado acima
+  window.database3dt = window.database3dt ?? database3dt;
+
+  // Carrega rev30-adapter.js (responsável por interceptar o botão Finalizar)
+  await new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = './rev30-adapter.js';
+    s.defer = true;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+
+  // Carrega criacao.js (todas as etapas da ficha)
+  await new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = './criacao.js';
+    s.defer = true;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+</script>
+
+<!-- ==== DEBUG: capturar o resultado exposto pela finalizarCriacao() ==== -->
+<script>
+  // Se a página estiver top-level, parent === window; então ouvimos as duas vias:
+  window.__FI_emitFinalize = function(personagem){
+    console.log("[__FI_emitFinalize] Recebido personagem:", personagem);
+    // aqui é onde, no “modo real”, você enviaria para o host/Discord
+    alert("✅ Personagem capturado via __FI_emitFinalize. Veja o console.");
+  };
+
+  window.addEventListener("message", (ev) => {
+    try{
+      if (ev && ev.data && ev.data.type === "FIcha3DT:FINALIZAR"){
+        console.log("[postMessage] Recebido personagem:", ev.data.personagemDados);
+        alert("✅ Personagem capturado via postMessage. Veja o console.");
+      }
+    }catch(_){}
+  });
+</script>
+
+<!--
+  =================================================================================================
+  A partir daqui é um acréscimo ao template original para permitir que o usuário saia do modo criação
+  assim que o personagem for finalizado. Esta versão também envia o personagem ao servidor via API
+  usando channelId/guildId e ownerUserId obtidos da query string. Após salvar, exibe um overlay e
+  retorna ao hub mantendo os parâmetros da URL.
+  =================================================================================================
+-->
+<script>
+  (function(){
+    const tryOverride = () => {
+      if (typeof window.__FI_emitFinalize !== 'function') {
+        setTimeout(tryOverride, 100);
+        return;
+      }
+      const originalEmit = window.__FI_emitFinalize;
+      window.__FI_emitFinalize = async function(personagem){
+        try {
+          if (typeof originalEmit === 'function') {
+            originalEmit.call(this, personagem);
+          }
+        } catch(_){ /* ignore */ }
+        // envia personagem para o Worker
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const channelId = params.get('channelId');
+          const guildId = params.get('guildId');
+          const userId = params.get('userId');
+          await fetch('https://forja-activity.kdc2099.workers.dev/api/character', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              channelId: channelId || undefined,
+              guildId: guildId || undefined,
+              ownerUserId: userId || null,
+              personagem: personagem
+            })
+          });
+        } catch(err){
+          console.error('Erro ao salvar personagem no Worker:', err);
+        }
+        // overlay de confirmação
+        const params2 = new URLSearchParams(window.location.search);
+        const cId  = params2.get('channelId');
+        const gId  = params2.get('guildId');
+        const uId  = params2.get('userId');
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.right = '0';
+        overlay.style.bottom = '0';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.85)';
+        overlay.style.display = 'flex';
+        overlay.style.flexDirection = 'column';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.zIndex = '99999';
+        const msg = document.createElement('div');
+        msg.textContent = '✅ Personagem finalizado!';
+        msg.style.color = '#fff';
+        msg.style.fontSize = '1.5rem';
+        msg.style.marginBottom = '1rem';
+        overlay.appendChild(msg);
+        const btn = document.createElement('button');
+        btn.textContent = 'Voltar à área do jogador';
+        btn.style.padding = '0.75rem 1.5rem';
+        btn.style.fontSize = '1rem';
+        btn.style.backgroundColor = '#0d6efd';
+        btn.style.color = '#fff';
+        btn.style.border = 'none';
+        btn.style.borderRadius = '0.25rem';
+        btn.style.cursor = 'pointer';
+        btn.onclick = function(){
+          const params3 = new URLSearchParams();
+          if (cId) params3.append('channelId', cId);
+          if (gId) params3.append('guildId', gId);
+          if (uId) params3.append('userId', uId);
+          const qs = params3.toString();
+          window.location.href = qs ? `/#/player?${qs}` : '/#/player';
+        };
+        overlay.appendChild(btn);
+        document.body.appendChild(overlay);
+      };
+    };
+    tryOverride();
+  })();
+</script>
+</body>
+</html>

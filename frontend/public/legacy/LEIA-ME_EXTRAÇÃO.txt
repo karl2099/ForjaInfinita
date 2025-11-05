@@ -1,0 +1,15 @@
+
+Arquivos gerados nesta etapa (para você baixar e colocar no projeto):
+
+1) Rev30_functions_map.csv — lista todas as funções detectadas no Ficha_3dt_Rev30, com flags se usam `database3dt` e/ou `personagemDados`, e um "palpite" do modo (criação/jogo/evolução/util).
+2) database3dt.extracted.module.js — módulo ES (JS) com `todasAsVantagens`, `todasAsDesvantagens`, `todasAsVantagensUnicas`, `todasAsPericias`, `todasAsMagias`, `elementosMagiaElemental` e `export const database3dt = { ... }` montado a partir do Rev30.
+
+Sugestão de destino no projeto:
+- Coloque o CSV onde quiser para consulta.
+- Coloque o JS em: frontend/public/assets/db/database3dt.module.js
+  (depois, na sua página/iframe de criação, você poderá usar:
+   <script type="module">
+     import { database3dt } from '/assets/db/database3dt.module.js';
+     // usar database3dt aqui...
+   </script>
+  )
