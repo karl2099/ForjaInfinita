@@ -1,0 +1,15 @@
+node_modules/
+dist/
+build/
+.cache/
+.out/
+*.log
+.wrangler/
+**/.wrangler/
+**/.wrangler/state/
+**/miniflare-D1DatabaseObject/
+.env
+*.env
+.dev.vars
+.vscode/
+.idea/
