@@ -1,7 +1,10 @@
 // Arquivo modificado para adicionar suporte a channelId/guildId
 // Original localizado em frontend/src/services/api.ts
 
-const API_BASE = "https://forja-activity.kdc2099.workers.dev"; // domínio do Worker
+// Importante: dentro do Discord Activity há CSP bloqueando conexões para domínios externos.
+// Por isso, o frontend deve chamar a API via MESMA ORIGEM ("self") e o deploy (Cloudflare Pages)
+// deve fazer proxy de /api/* para o Worker via arquivo public/_redirects.
+const API_BASE = ""; // mesma origem
 
 /*
  * Cria um personagem no banco. Agora aceita tanto `campaignId` quanto

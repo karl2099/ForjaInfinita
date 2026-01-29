@@ -34,6 +34,9 @@ function App() {
   // Mantivemos uma campanha fixa apenas para Lobby; em outros lugares usamos channelId
   const [campaignId] = useState("camp_demo");
 
+  // Quando o jogador abre um personagem existente, guardamos o id para repassar ao destino
+  const [openCharacterId, setOpenCharacterId] = useState<string | undefined>(undefined);
+
   const goHome = () => setScreen("start");
   const goBack = () => {
     setScreen((s) => {
@@ -58,12 +61,23 @@ function App() {
             userId={user.id}
             channelId={channelId}
             guildId={guildId}
-            onCreate={() => setScreen("create")}
-            onOpenChar={(id) => console.log("abrir personagem", id)}
+            onCreate={() => {
+              setOpenCharacterId(undefined);
+              setScreen("create");
+            }}
+            onOpenChar={(id) => {
+              setOpenCharacterId(id);
+              setScreen("create");
+            }}
           />
         )}
         {screen === "create" && (
-          <CreateCharacter channelId={channelId} guildId={guildId} userId={user.id} />
+          <CreateCharacter
+            channelId={channelId}
+            guildId={guildId}
+            userId={user.id}
+            characterId={openCharacterId}
+          />
         )}
         {screen === "lobby" && (
           <Lobby campaignId={campaignId} user={user} onCreate={() => setScreen("create")} />

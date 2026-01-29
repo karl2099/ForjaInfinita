@@ -411,7 +411,7 @@ window.addEventListener('error', function (e) {
           const channelId = params.get('channelId');
           const guildId = params.get('guildId');
           const userId = params.get('userId');
-          await fetch('https://forja-activity.kdc2099.workers.dev/api/character', {
+          await fetch('/api/character', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
